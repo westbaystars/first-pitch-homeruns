@@ -1,0 +1,58 @@
+# One-Pitch Home Runs
+
+```elixir
+Mix.install([
+  {:table_rex, git: "https://github.com/westbaystars/table_rex.git", override: true},
+  {:explorer, "~> 0.3.0"},
+  {:kino, "~> 0.6.2"}
+])
+```
+
+## データをインポート
+
+```elixir
+import Explorer.DataFrame
+alias Explorer.Series
+
+df =
+  from_csv!(
+    "~/data/balls-in-play-2022.tsv",
+    delimiter: "\t"
+  )
+
+df
+|> table()
+```
+
+## ホームランを集計しましょう
+
+```elixir
+teams = %{
+  "CHU" => "中",
+  "HAN" => "神",
+  "HIR" => "広",
+  "YAK" => "ヤ",
+  "YOK" => "De",
+  "YOM" => "巨",
+  "LOT" => "ロ",
+  "NIP" => "日",
+  "ORX" => "オ",
+  "RAK" => "楽",
+  "SEI" => "西",
+  "SFT" => "ソ"
+}
+
+df
+|> filter_with(&Series.equal(&1["Pitches"], 1))
+|> filter_with(&Series.equal(&1["Result"], "home-run"))
+|> mutate(チーム: &Series.transform(&1["Team"], fn team -> Map.get(teams, team) end))
+|> group_by(["選手", "チーム"])
+|> summarise(Pitches: [:count])
+|> rename(Pitches_count: "本塁打")
+|> arrange(desc: "本塁打")
+|> table(limit: :infinity)
+```
+
+### 2022年 9月 24日現在の本塁リーダ
+
+![](images/2022-09-24-home-runs.png)
