@@ -1,4 +1,4 @@
-# One-Pitch Home Runs
+# 一球目のホームラン
 
 ```elixir
 Mix.install([
@@ -16,7 +16,7 @@ alias Explorer.Series
 
 df =
   from_csv!(
-    "~/data/balls-in-play-2022.tsv",
+    "~/first-pitch-homeruns/balls-in-play-2022.tsv",
     delimiter: "\t"
   )
 
@@ -43,14 +43,12 @@ teams = %{
 }
 
 df
-|> filter_with(&Series.equal(&1["Pitches"], 1))
 |> filter_with(&Series.equal(&1["Result"], "home-run"))
-|> mutate(チーム: &Series.transform(&1["Team"], fn team -> Map.get(teams, team) end))
-|> group_by(["選手", "チーム"])
+|> group_by(["選手", "Team"])
 |> summarise(Pitches: [:count])
 |> rename(Pitches_count: "本塁打")
 |> arrange(desc: "本塁打")
-|> table(limit: :infinity)
+|> table(limit: 30)
 ```
 
 ### 2022年 9月 24日現在の本塁リーダ
