@@ -3,8 +3,7 @@
 ```elixir
 Mix.install([
   {:table_rex, git: "https://github.com/westbaystars/table_rex.git", override: true},
-  {:explorer, "~> 0.3.0"},
-  {:kino, "~> 0.6.2"}
+  {:explorer, "~> 0.3.1"}
 ])
 ```
 
